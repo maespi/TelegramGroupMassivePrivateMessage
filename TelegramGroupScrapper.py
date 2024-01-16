@@ -1,12 +1,18 @@
 from time import sleep
 from selenium import webdriver 
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
+
+ids = {}
+done = []
+msg = "Hello World"
  
 # initialize an instance of the chrome driver (browser)
-driver = webdriver.Chrome(r"C:\Users\portatil_upf\Downloads\chromedriver-win64\chromedriver-win64\chromedriver.exe")
+driver = webdriver.Chrome()
 # visit your target site
 driver.get('https://web.telegram.org/k/')
-sleep(25)
+sleep(30)
 
 def get_ids():
     driver.get('https://web.telegram.org/k/#-1338476666')
@@ -20,24 +26,28 @@ def get_ids():
         members = chat.find_elements(By.TAG_NAME,'a')
         if len(chat_members)<len(members): chat_members = members
 
-    ids = []
     for member in chat_members:
-        ids.append(member.get_attribute("data-peer-id"))
-    
-    
-    return ids
+        ids[member.find_element(By.CLASS_NAME, "user-title").text] = member.get_attribute("data-peer-id")
 
-def access_profiles(ids):
-    for id_num in ids:
-        url = "https://web.telegram.org/k/#" + str(id_num)
-        print(url)
+
+def access_profiles(message):
+    for i in ids:
+        url = "https://web.telegram.org/k/#" + str(ids[i])
+        print(i)
         driver.get(url)
-        sleep(3)
+        sleep(1)
+        if(i=='Marc *Calvo*'):
+            actions = ActionChains(driver)
+            actions.send_keys(message)
+            actions.send_keys(Keys.ENTER)
+            actions.perform()
+            sleep(1)
+            
 
-ids = get_ids()
+get_ids()
 print("------Start------")
 print(ids)
 print("------End------")
-access_profiles(ids)
+access_profiles(msg)
 
 driver.quit()
