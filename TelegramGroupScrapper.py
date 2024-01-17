@@ -7,12 +7,22 @@ from selenium.webdriver.common.action_chains import ActionChains
 ids = {}
 done = []
 msg = "Hello World"
- 
+
+options = webdriver.ChromeOptions()
+options.add_argument("--user-data-dir=C:/Users/marca/AppData/Local/Google/Chrome/User Data/Default")
+options.add_experimental_option(
+    "prefs", {
+        # block image loading
+        "profile.managed_default_content_settings.images": 3,
+    }
+)
 # initialize an instance of the chrome driver (browser)
-driver = webdriver.Chrome()
+driver = webdriver.Chrome(
+    options=options
+)
 # visit your target site
 driver.get('https://web.telegram.org/k/')
-sleep(30)
+sleep(10)
 
 def get_ids():
     driver.get('https://web.telegram.org/k/#-1338476666')
@@ -31,18 +41,25 @@ def get_ids():
 
 
 def access_profiles(message):
+    global driver
+    cont=0
     for i in ids:
         url = "https://web.telegram.org/k/#" + str(ids[i])
         print(i)
         driver.get(url)
         sleep(1)
+        cont += 1
         if(i=='Marc *Calvo*'):
             actions = ActionChains(driver)
             actions.send_keys(message)
             actions.send_keys(Keys.ENTER)
             actions.perform()
             sleep(1)
-            
+        if cont%50==0:
+            driver.quit()
+            driver = webdriver.Chrome(
+                                    options=options
+                                    )
 
 get_ids()
 print("------Start------")
